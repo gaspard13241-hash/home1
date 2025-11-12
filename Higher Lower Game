@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Higher or Lower: Followers Edition</title>
+<style>
+  body {
+    background: radial-gradient(circle at top, #001100, #000);
+    color: #00ff99;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 20px;
+  }
+  .logo {
+    white-space: pre;
+    color: #00ffaa;
+    text-shadow: 0 0 12px #00ffcc;
+    font-size: 11px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  button {
+    background-color: #00ff99;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover {
+    background-color: #5effc8;
+    transform: scale(1.05);
+  }
+  .cards-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .card {
+    background-color: #101010;
+    border: 2px solid #00ffaa;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    width: 280px;
+    box-shadow: 0 0 10px rgba(0,255,170,0.4);
+  }
+  .card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  .vs {
+    font-size: 28px;
+    margin: 10px;
+    text-shadow: 0 0 10px #00ffcc;
+  }
+  @media (max-width:600px) {
+    .logo {font-size:8px;}
+    .card {width: 90%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="logo">
+██╗  ██╗██╗ ██████╗ ██╗  ██╗███████╗██████╗  
+██║  ██║██║██╔════╝ ██║  ██║██╔════╝██╔══██╗ 
+███████║██║██║  ███╗███████║█████╗  ██████╔╝ 
+██╔══██║██║██║   ██║██╔══██║██╔══╝  ██╔══██╗ 
+██║  ██║██║╚██████╔╝██║  ██║███████╗██║  ██║ 
+╚═╝  ╚═╝╚═╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ 
+             HIGHER  or  LOWER
+</div>
+
+<div id="gameArea" class="game-container"></div>
+
+<script>
+const game = {
+  sport_data: [
+    {
+      name: "Lionel Messi",
+      followers: 500000000,
+      description: "Argentinian football legend and World Cup champion.",
+      country: "Argentina",
+      image: "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lionel_Messi_20180626.jpg"
+    },
+    {
+      name: "Cristiano Ronaldo",
+      followers: 500000000,
+      description: "Portuguese superstar and one of the greatest footballers ever.",
+      country: "Portugal",
+      image: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Cristiano_Ronaldo_2018.jpg"
+    },
+    {
+      name: "Serena Williams",
+      followers: 100000000,
+      description: "Tennis champion, winner of 23 Grand Slam singles titles.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Serena_Williams_at_2013_US_Open.jpg"
+    },
+    {
+      name: "LeBron James",
+      followers: 100000000,
+      description: "NBA champion, considered one of the greatest basketball players.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/LeBron_James_2019.jpg"
+    },
+    {
+      name: "Usain Bolt",
+      followers: 10000000,
+      description: "Jamaican sprinter, the fastest man alive.",
+      country: "Jamaica",
+      image: "https://upload.wikimedia.org/wikipedia/commons/9/9f/Usain_Bolt_Rio_100m_final_2016.jpg"
+    }
+  ],
+  celebrities_data: [
+    {
+      name: "Taylor Swift",
+      followers: 250000000,
+      description: "Singer-songwriter known for heartfelt storytelling and record-breaking tours.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Taylor_Swift_June_2019.jpg"
+    },
+    {
+      name: "Dwayne Johnson",
+      followers: 300000000,
+      description: "Actor and former wrestler known as 'The Rock'.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Dwayne_Johnson_2%2C_2018.jpg"
+    },
+    {
+      name: "Kylie Jenner",
+      followers: 300000000,
+      description: "Businesswoman and founder of Kylie Cosmetics.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/f/f4/Kylie_Jenner_Vogue_2019.png"
+    },
+    {
+      name: "Selena Gomez",
+      followers: 400000000,
+      description: "Singer, actress, and producer with a massive following worldwide.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Selena_Gomez_2019_by_Glenn_Francis.jpg"
+    },
+    {
+      name: "Ariana Grande",
+      followers: 350000000,
+      description: "Grammy-winning pop artist and actress.",
+      country: "USA",
+      image: "https://upload.wikimedia.org/wikipedia/commons/6/69/Ariana_Grande_2019_by_Glenn_Francis.jpg"
+    }
+  ]
+};
+game.mixed_data = [...game.sport_data, ...game.celebrities_data];
+
+let data = [];
+let score = 0;
+let A, B;
+
+const area = document.getElementById("gameArea");
+
+function init() {
+  area.innerHTML = `
+    <p>Do you want to play Higher or Lower?</p>
+    <button onclick="chooseMode()">Yes</button>
+    <button onclick="area.innerHTML='<p>👋 Thanks for visiting!</p>';">No</button>
+  `;
+}
+
+function chooseMode() {
+  area.innerHTML = `
+    <p>Choose your game mode:</p>
+    <button onclick="setMode('sports')">🏆 Sports</button>
+    <button onclick="setMode('celebs')">🎤 Celebrities</button>
+    <button onclick="setMode('mixed')">🌍 Mixed</button>
+  `;
+}
+
+function setMode(mode) {
+  if (mode === "sports") data = game.sport_data;
+  else if (mode === "celebs") data = game.celebrities_data;
+  else data = game.mixed_data;
+
+  score = 0;
+  A = randomPick();
+  nextRound();
+}
+
+function randomPick() {
+  return data[Math.floor(Math.random() * data.length)];
+}
+
+function nextRound() {
+  B = randomPick();
+  while (A.name === B.name) B = randomPick();
+  showCards();
+}
+
+function showCards() {
+  area.innerHTML = `
+    <p>Current Score: <strong>${score}</strong></p>
+    <div class="cards-flex">
+      <div class="card">
+        <h3>A: ${A.name}</h3>
+        <img src="${A.image}" alt="${A.name}">
+        <p>${A.description}</p>
+        <p><em>${A.country}</em></p>
+      </div>
+      <div class="vs">VS</div>
+      <div class="card">
+        <h3>B: ${B.name}</h3>
+        <img src="${B.image}" alt="${B.name}">
+        <p>${B.description}</p>
+        <p><em>${B.country}</em></p>
+      </div>
+    </div>
+    <p>Who has more followers?</p>
+    <button onclick="makeChoice('A')">A</button>
+    <button onclick="makeChoice('B')">B</button>
+  `;
+}
+
+function makeChoice(choice) {
+  const correct = A.followers > B.followers ? 'A' : 'B';
+  if (choice === correct) {
+    score++;
+    A = B;
+    nextRound();
+  } else {
+    area.innerHTML = `
+      <h2>❌ Wrong!</h2>
+      <p>Final Score: ${score}</p>
+      <button onclick="init()">Play Again</button>
+    `;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
